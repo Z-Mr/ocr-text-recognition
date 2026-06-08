@@ -1,0 +1,14 @@
+# 虚拟环境
+.venv/
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 模型缓存（PaddleOCR 会自动下载到 ~/.paddleocr，此处忽略本地缓存）
+inference/
+output/
+
+# 临时文件
+*.tmp
+.DS_Store

@@ -48,7 +48,7 @@ bash run.sh
 ## 项目结构
 
 ```
-OCR-project/
+ocr-text-recognition/
 ├── app.py              # Gradio Web 界面入口
 ├── ocr_engine.py       # OCR 核心引擎（封装 PaddleOCR 3.x）
 ├── requirements.txt    # Python 依赖列表

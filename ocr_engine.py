@@ -6,20 +6,53 @@ OCR 核心引擎 —— 基于 PaddleOCR 3.x 封装文字识别功能
 from paddleocr import PaddleOCR
 from PIL import Image, ImageDraw, ImageFont
 import logging
+import os
 import numpy as np
+
+# 项目根目录下的本地模型目录
+_PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+_DEFAULT_MODEL_DIR = os.path.join(_PROJECT_ROOT, "models")
+
+# 子模型名称 → PaddleOCR 初始化参数名的映射
+_MODEL_DIR_MAP = {
+    "PP-LCNet_x1_0_doc_ori": "doc_orientation_classify_model_dir",
+    "UVDoc": "doc_unwarping_model_dir",
+    "PP-LCNet_x1_0_textline_ori": "textline_orientation_model_dir",
+    "PP-OCRv5_server_det": "text_detection_model_dir",
+    "PP-OCRv5_server_rec": "text_recognition_model_dir",
+}
 
 
 class OCREngine:
     """OCR 识别引擎，封装 PaddleOCR 3.x 的初始化与推理逻辑"""
 
-    def __init__(self, lang: str = "ch"):
+    def __init__(self, lang: str = "ch", model_base_dir: str | None = None):
         """
         初始化 OCR 引擎
 
         参数:
             lang: 识别语言，"ch" 表示中英混合，"en" 表示纯英文
+            model_base_dir: 本地模型根目录，默认为项目下的 models/ 目录。
+                           若目录下存在子模型则优先使用本地模型，
+                           否则 PaddleOCR 会自动从网络下载。
         """
-        self.ocr = PaddleOCR(lang=lang)
+        base = model_base_dir or _DEFAULT_MODEL_DIR
+        kwargs: dict = {}
+        has_local_models = False
+
+        # 如果本地有对应子模型目录，则指定路径，避免联网下载
+        if os.path.isdir(base):
+            for sub_dir, param_name in _MODEL_DIR_MAP.items():
+                local_path = os.path.join(base, sub_dir)
+                if os.path.isdir(local_path):
+                    kwargs[param_name] = local_path
+                    has_local_models = True
+
+        # 仅在未使用本地模型目录时传入 lang
+        if not has_local_models:
+            kwargs["lang"] = lang
+
+        self.ocr = PaddleOCR(**kwargs)
 
     def recognize(self, image_path: str) -> list[dict]:
         """

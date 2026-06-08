@@ -89,6 +89,21 @@ echo ""
 echo "============================================"
 echo "  环境初始化完成！"
 echo ""
+
+# ── 4. 模型文件 ─────────────────────────────────────────────────────────────
+
+MODEL_DIR="$PROJECT_DIR/models"
+if [ -d "$MODEL_DIR" ] && [ "$(ls -A "$MODEL_DIR" 2>/dev/null)" ]; then
+    echo "[✓] 本地模型已就绪: $MODEL_DIR"
+elif [ -d "$HOME/.paddlex/official_models" ]; then
+    echo "正在从本地缓存复制模型文件..."
+    cp -r "$HOME/.paddlex/official_models" "$MODEL_DIR"
+    echo "[✓] 模型已复制到: $MODEL_DIR"
+else
+    echo "[i] 模型文件将在首次识别时自动下载（约 200MB）"
+fi
+
+echo ""
 echo "  启动项目请运行："
 echo "    source .venv/bin/activate"
 echo "    python app.py"

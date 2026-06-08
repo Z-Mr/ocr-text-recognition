@@ -54,6 +54,12 @@ OCR-project/
 ├── requirements.txt    # Python 依赖列表
 ├── setup.sh            # 一键环境初始化脚本
 ├── run.sh              # 一键启动脚本
+├── models/             # 本地模型文件（首次运行后自动缓存）
+│   ├── PP-LCNet_x1_0_doc_ori/       # 文档方向分类模型
+│   ├── PP-LCNet_x1_0_textline_ori/  # 文本行方向分类模型
+│   ├── PP-OCRv5_server_det/         # 文字检测模型
+│   ├── PP-OCRv5_server_rec/         # 文字识别模型
+│   └── UVDoc/                       # 文档去弯曲模型
 ├── .gitignore          # Git 忽略规则
 └── README.md           # 本文档
 ```
@@ -71,7 +77,7 @@ OCR-project/
 
 ### Q: 首次识别很慢？
 
-首次识别时 PaddleOCR 会自动从 ModelScope 下载模型文件（约 200MB），下载完成后会缓存在 `~/.paddlex/` 目录，后续使用无需再下载。
+如果项目 `models/` 目录下已有模型文件，启动几乎是即时的。若模型文件缺失，PaddleOCR 会自动从 ModelScope 下载（约 200MB），下载完成后后续使用无需再下载。
 
 ### Q: pip 安装依赖失败？
 
@@ -92,13 +98,17 @@ pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ -r requirements.txt
 - 倾斜角度较大的文字可能需要先做预处理
 - 手写体识别效果不如印刷体
 
+## 模型管理
+
+项目内置了 `models/` 目录存放所有子模型，引擎启动时会优先读取本地模型，无需联网下载。模型来源说明：
+
+- **自动获取**：首次启动时，PaddleOCR 会自动从 ModelScope 下载模型（约 200MB）到 `~/.paddlex/official_models/`
+- **本地化**：运行 `setup.sh` 时会自动将缓存的模型拷贝到项目 `models/` 目录
+- **手动拷贝**：如需在无网络环境部署，将 `models/` 目录整体拷贝到目标机器的项目目录下即可
+
 ## 离线使用
 
-模型下载完成后，项目可完全离线运行。如需在无网络的机器上部署，可将以下目录拷贝到目标机器：
-
-```
-~/.paddlex/official_models/
-```
+本项目支持完全离线运行。模型和所有依赖均存放于项目本地目录（`models/` 和 `.venv/`），无需联网即可完成文字识别。
 
 ## License
 
